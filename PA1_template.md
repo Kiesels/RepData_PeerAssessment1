@@ -1,47 +1,50 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 data <- read.csv("activity.csv")
 ```
 
 ## Calculate the total number of steps taken per day and show on a histogram
 
-```{r}
+
+```r
 totalsteps <- as.data.frame(xtabs(steps ~ date, data))
 library(ggplot2)
 qplot(totalsteps$Freq, geom="histogram") 
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
-The mean of the total number of steps taken per day is **`r mean(totalsteps$Freq)`** calculated with *mean(totalsteps$Freq)*  
 
-The median of the total number of steps taken per day is **`r median(totalsteps$Freq)`** calculated with *median(totalsteps$Freq)*
+The mean of the total number of steps taken per day is **9354.2295082** calculated with *mean(totalsteps$Freq)*  
+
+The median of the total number of steps taken per day is **1.0395\times 10^{4}** calculated with *median(totalsteps$Freq)*
 
 # The average daily activity pattern  
 
-```{r}
+
+```r
 stepsbyintervalmean <- aggregate(steps ~ interval, data, mean)
 qplot(interval, steps, data = stepsbyintervalmean, geom = "line", main = " Mean of Steps by Interval")
 ```
 
-5-minute interval, on average across all the days in the dataset, contains the maximum number of steps **`r stepsbyintervalmean[which.max(stepsbyintervalmean[,2]),1]` - `r stepsbyintervalmean[(which.max(stepsbyintervalmean[,2])+1),1]`**
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+5-minute interval, on average across all the days in the dataset, contains the maximum number of steps **835 - 840**
 calculated with
 *stepsbyintervalmean[which.max(stepsbyintervalmean[,2]),1] and stepsbyintervalmean[(which.max(stepsbyintervalmean[,2])+1),1]*
 
 # Imputing missing values
-The total number of missing values in the dataset is **`r sum(!complete.cases(data))`**
+The total number of missing values in the dataset is **2304**
 calculated with *sum(!complete.cases(data))*
 
 A new dataset that is equal to the original dataset but with the missing data filled in
-```{r}
+
+```r
 colnames(stepsbyintervalmean)[2] <- "stepsmean"
 mergeddata <- merge(data, stepsbyintervalmean, by = "interval", all = TRUE, sort = FALSE)
 for (i in 1:nrow(mergeddata) ) {
@@ -51,25 +54,29 @@ for (i in 1:nrow(mergeddata) ) {
 ```
 
 
-```{r}
+
+```r
 totalstepsmodified <- as.data.frame(xtabs(steps ~ date, mergeddata))
 library(ggplot2)
 qplot(totalstepsmodified$Freq, geom="histogram") 
 ```
 
-The mean of the total number of steps taken per day where NAs are replaced by mean is **`r mean(totalstepsmodified$Freq)`** calculated with *mean(totalstepsmodified$Freq)*  
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
-The median of the total number of steps taken per day where NAs are replaced by median is **`r median(totalstepsmodified$Freq)`** calculated with *median(totalstepsmodified$Freq)*
+The mean of the total number of steps taken per day where NAs are replaced by mean is **1.0766189\times 10^{4}** calculated with *mean(totalstepsmodified$Freq)*  
 
-The difference between the original and the replaced mean is **`r mean(totalsteps$Freq) - mean(totalstepsmodified$Freq)`** calculated with *mean(totalsteps$Freq) - mean(totalstepsmodified$Freq)*
+The median of the total number of steps taken per day where NAs are replaced by median is **1.0766189\times 10^{4}** calculated with *median(totalstepsmodified$Freq)*
 
-The difference between the original and the replaced median is **`r median(totalsteps$Freq) - median(totalstepsmodified$Freq)`** calculated with *median(totalsteps$Freq) - median(totalstepsmodified$Freq)*
+The difference between the original and the replaced mean is **-1411.959171** calculated with *mean(totalsteps$Freq) - mean(totalstepsmodified$Freq)*
+
+The difference between the original and the replaced median is **-371.1886792** calculated with *median(totalsteps$Freq) - median(totalstepsmodified$Freq)*
 
 # Differences in activity patterns between weekdays and weekends
 
-```{r}
+
+```r
 for (i in 1:nrow(data) ) {
-  if ((weekdays(as.Date(data[i,2])) == "szombat") | (weekdays(as.Date(data[i,2])) == "vasárnap")) 
+  if ((weekdays(as.Date(data[i,2])) == "szombat") | (weekdays(as.Date(data[i,2])) == "vasÃ¡rnap")) 
     {data[i,4] <- "weekend"}
     else {
       data[i,4] <- "weekday"
@@ -79,9 +86,12 @@ data$V4 <- as.factor(data$V4)
 stepsbyintervalmeanWD <- aggregate(steps ~ interval + V4, data, mean)
 ```
 
-```{r}
+
+```r
 library(lattice)
 xyplot(stepsbyintervalmeanWD$steps ~ stepsbyintervalmeanWD$interval | stepsbyintervalmeanWD$V4, panel = function(x, y, layout = c(1,2)) {panel.xyplot(x, y, type = "a")
 })
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
 
